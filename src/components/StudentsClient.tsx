@@ -36,6 +36,7 @@ import {
 interface Props {
   students: Student[]
   userId: string
+  isPro: boolean
 }
 
 type DialogMode = 'add' | 'edit' | null
@@ -49,9 +50,12 @@ interface FormState {
 
 const EMPTY_FORM: FormState = { name: '', phone: '', fee_amount: '', due_day: '1' }
 const DUE_DAYS = Array.from({ length: 28 }, (_, i) => String(i + 1))
+const FREE_LIMIT = 3
 
-export default function StudentsClient({ students, userId }: Props) {
+export default function StudentsClient({ students, userId, isPro }: Props) {
   const router = useRouter()
+
+  const atLimit = !isPro && students.length >= FREE_LIMIT
 
   const [dialogMode, setDialogMode] = useState<DialogMode>(null)
   const [editTarget, setEditTarget] = useState<Student | null>(null)
@@ -147,12 +151,22 @@ export default function StudentsClient({ students, userId }: Props) {
               Students ({students.length})
             </h1>
           </div>
-          <Button size="sm" onClick={openAdd}>
+          <Button size="sm" onClick={openAdd} disabled={atLimit}>
             <Plus />
             Add Student
           </Button>
         </div>
       </header>
+
+      {atLimit && (
+        <div className="border-b border-yellow-200 bg-yellow-50 px-4 py-2 text-center text-sm text-yellow-800">
+          Free plan is limited to {FREE_LIMIT} students.{' '}
+          <Link href="/dashboard" className="font-semibold underline underline-offset-2">
+            Upgrade to Pro
+          </Link>{' '}
+          to add more.
+        </div>
+      )}
 
       <main className="max-w-5xl mx-auto px-4 py-6">
         {students.length === 0 ? (

@@ -61,5 +61,13 @@ export default async function DashboardPage() {
     payments = [...existing, ...inserted]
   }
 
-  return <DashboardClient students={students} payments={payments} />
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_pro')
+    .eq('id', user.id)
+    .single()
+
+  const isPro = profile?.is_pro ?? false
+
+  return <DashboardClient students={students} payments={payments} isPro={isPro} />
 }

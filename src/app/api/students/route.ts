@@ -44,6 +44,28 @@ export async function POST(request: Request) {
 
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_pro')
+    .eq('id', user.id)
+    .single()
+
+  const isPro = profile?.is_pro ?? false
+
+  if (!isPro) {
+    const { count } = await supabase
+      .from('students')
+      .select('*', { count: 'exact', head: true })
+      .eq('owner_id', user.id)
+
+    if ((count ?? 0) >= 3) {
+      return NextResponse.json(
+        { error: 'Free plan is limited to 3 students. Upgrade to Pro to add more.' },
+        { status: 403 }
+      )
+    }
+  }
+
   const body = (await request.json()) as Record<string, unknown>
   const validationError = validate(body)
   if (validationError)

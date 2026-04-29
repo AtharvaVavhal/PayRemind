@@ -19,5 +19,13 @@ export default async function StudentsPage() {
 
   const students: Student[] = data ?? []
 
-  return <StudentsClient students={students} userId={user.id} />
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('is_pro')
+    .eq('id', user.id)
+    .single()
+
+  const isPro = profile?.is_pro ?? false
+
+  return <StudentsClient students={students} userId={user.id} isPro={isPro} />
 }

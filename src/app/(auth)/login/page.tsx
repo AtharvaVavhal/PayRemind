@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 import { createBrowserClient } from '@supabase/ssr'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -56,9 +57,16 @@ export default function LoginPage() {
   return (
     <Card className="w-full max-w-sm">
       <CardHeader>
-        <p className="text-center text-2xl font-bold tracking-tight text-primary">
-          PayRemind
-        </p>
+        <div className="flex justify-center mb-2">
+          <Image
+            src="/logo.svg"
+            alt="PayRemind Logo"
+            width={200}
+            height={60}
+            className="h-16 w-auto"
+            priority
+          />
+        </div>
         <CardTitle className="text-center text-base text-muted-foreground font-normal">
           {mode === 'login' ? 'Sign in to your account' : 'Create your account'}
         </CardTitle>

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { Menu, X } from 'lucide-react'
 import { supabase } from '@/lib/supabase-browser'
 import { Button } from '@/components/ui/button'
@@ -53,8 +54,15 @@ export default function NavBar({ userEmail }: Props) {
     <header className="sticky top-0 z-40 border-b border-gray-200 bg-white shadow-sm">
       <div className="mx-auto flex h-14 max-w-5xl items-center justify-between gap-4 px-4">
         {/* Logo */}
-        <Link href="/dashboard" className="shrink-0 text-lg font-bold text-primary">
-          PayRemind
+        <Link href="/dashboard" className="shrink-0">
+          <Image
+            src="/logo.svg"
+            alt="PayRemind Logo"
+            width={400}
+            height={120}
+            className="h-12 w-auto"
+            priority
+          />
         </Link>
 
         {/* Desktop nav */}

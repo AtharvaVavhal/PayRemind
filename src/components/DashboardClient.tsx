@@ -8,6 +8,7 @@ import type { Student, Payment, StudentWithPayment } from '@/types'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import SubscribeButton from '@/components/SubscribeButton'
 import {
   Table,
   TableBody,
@@ -20,9 +21,10 @@ import {
 interface Props {
   students: Student[]
   payments: Payment[]
+  isPro: boolean
 }
 
-export default function DashboardClient({ students, payments }: Props) {
+export default function DashboardClient({ students, payments, isPro }: Props) {
   const router = useRouter()
   const [loadingId, setLoadingId] = useState<string | null>(null)
 
@@ -47,7 +49,7 @@ export default function DashboardClient({ students, payments }: Props) {
 
   async function handleReminder(swp: StudentWithPayment) {
     if (!swp.payment || loadingId) return
-    const link = generateWhatsAppLink(swp.name, swp.phone, swp.fee_amount)
+    const link = generateWhatsAppLink(swp.name, swp.phone, swp.fee_amount, swp.payment.id)
     window.open(link, '_blank', 'noopener,noreferrer')
     setLoadingId(swp.payment.id)
     await fetch(`/api/payments/${swp.payment.id}/reminder`, { method: 'PATCH' })
@@ -64,7 +66,7 @@ export default function DashboardClient({ students, payments }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-white">
       <main className="max-w-5xl mx-auto px-4 py-6 flex flex-col gap-6">
         {/* Summary card */}
         <Card>
@@ -78,6 +80,19 @@ export default function DashboardClient({ students, payments }: Props) {
             </p>
           </CardContent>
         </Card>
+
+        {/* Upgrade banner */}
+        {!isPro && (
+          <Card className="border-blue-200 bg-blue-50">
+            <CardContent className="flex items-center justify-between py-4">
+              <div>
+                <p className="font-medium text-blue-900">Upgrade to Pro</p>
+                <p className="text-sm text-blue-700">Unlimited students, payment links &amp; more — ₹99/month</p>
+              </div>
+              <SubscribeButton />
+            </CardContent>
+          </Card>
+        )}
 
         {/* Students table */}
         {studentsWithPayments.length === 0 ? (
