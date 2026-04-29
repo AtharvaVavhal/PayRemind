@@ -1,78 +1,80 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import BackgroundGlow from '@/components/ui/background-components'
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white text-slate-900">
-      {/* Navbar */}
-      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-100">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.svg" alt="PayRemind" width={120} height={36} className="h-9 w-auto" />
-          </Link>
-          <nav className="flex items-center gap-3">
-            <Link
-              href="#how-it-works"
-              className="hidden sm:block text-sm text-slate-600 hover:text-slate-900 transition-colors"
-            >
-              How it works
+    <BackgroundGlow>
+      <div className="min-h-screen text-slate-900">
+        {/* Navbar */}
+        <header className="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-100">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+            <Link href="/" className="flex items-center gap-2">
+              <Image src="/logo.svg" alt="PayRemind" width={160} height={48} className="h-11 w-auto" />
             </Link>
-            <Link
-              href="#pricing"
-              className="hidden sm:block text-sm text-slate-600 hover:text-slate-900 transition-colors"
-            >
-              Pricing
-            </Link>
+            <nav className="flex items-center gap-3">
+              <Link
+                href="#how-it-works"
+                className="hidden sm:block text-sm text-slate-600 hover:text-slate-900 transition-colors"
+              >
+                How it works
+              </Link>
+              <Link
+                href="#pricing"
+                className="hidden sm:block text-sm text-slate-600 hover:text-slate-900 transition-colors"
+              >
+                Pricing
+              </Link>
+              <Link
+                href="/login"
+                className="ml-2 inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+              >
+                Login
+              </Link>
+            </nav>
+          </div>
+        </header>
+
+        {/* Hero */}
+        <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-24 text-center">
+          <span className="inline-block mb-5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 tracking-wide uppercase">
+            Built for coaching classes in India
+          </span>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tight text-slate-900">
+            Stop Chasing Fees.<br />
+            <span className="text-indigo-600">Start Collecting Them.</span>
+          </h1>
+          <p className="mt-6 text-lg sm:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
+            PayRemind automates fee reminders via WhatsApp, tracks payments month by month,
+            and sends digital receipts — so you spend time teaching, not texting.
+          </p>
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               href="/login"
-              className="ml-2 inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium bg-indigo-600 text-white hover:bg-indigo-700 transition-colors"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-7 py-3.5 rounded-xl text-base font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-sm"
             >
-              Login
+              Start for free — no card needed
             </Link>
-          </nav>
-        </div>
-      </header>
-
-      {/* Hero */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-24 text-center">
-        <span className="inline-block mb-5 px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100 tracking-wide uppercase">
-          Built for coaching classes in India
-        </span>
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight tracking-tight text-slate-900">
-          Stop Chasing Fees.<br />
-          <span className="text-indigo-600">Start Collecting Them.</span>
-        </h1>
-        <p className="mt-6 text-lg sm:text-xl text-slate-500 max-w-2xl mx-auto leading-relaxed">
-          PayRemind automates fee reminders via WhatsApp, tracks payments month by month,
-          and sends digital receipts — so you spend time teaching, not texting.
-        </p>
-        <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link
-            href="/login"
-            className="w-full sm:w-auto inline-flex items-center justify-center px-7 py-3.5 rounded-xl text-base font-semibold bg-indigo-600 text-white hover:bg-indigo-700 transition-colors shadow-sm"
-          >
-            Start for free — no card needed
-          </Link>
-          <Link
-            href="#how-it-works"
-            className="w-full sm:w-auto inline-flex items-center justify-center px-7 py-3.5 rounded-xl text-base font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
-          >
-            See how it works
-          </Link>
-        </div>
-        <p className="mt-4 text-sm text-slate-400">Free for up to 3 students · No credit card required</p>
-      </section>
+            <Link
+              href="#how-it-works"
+              className="w-full sm:w-auto inline-flex items-center justify-center px-7 py-3.5 rounded-xl text-base font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 transition-colors"
+            >
+              See how it works
+            </Link>
+          </div>
+          <p className="mt-4 text-sm text-slate-400">Free for up to 3 students · No credit card required</p>
+        </section>
 
       {/* Problem */}
-      <section className="bg-slate-50 py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-slate-900 mb-3">
-            Sound familiar?
-          </h2>
-          <p className="text-center text-slate-500 mb-12 max-w-xl mx-auto">
-            Every coaching class owner faces the same monthly headache.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <section className="bg-slate-50 py-20">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <h2 className="text-3xl sm:text-4xl font-bold text-center text-slate-900 mb-3">
+              Sound familiar?
+            </h2>
+            <p className="text-center text-slate-500 mb-12 max-w-xl mx-auto">
+              Every coaching class owner faces the same monthly headache.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {[
               {
                 heading: 'Manually texting each parent',
@@ -100,20 +102,20 @@ export default function Home() {
                 <p className="text-sm text-slate-500 leading-relaxed">{card.body}</p>
               </div>
             ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* Solution */}
-      <section className="py-20">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-slate-900 mb-3">
-            PayRemind fixes this in 2 minutes
-          </h2>
-          <p className="text-center text-slate-500 mb-12 max-w-xl mx-auto">
-            One dashboard, zero spreadsheets, automatic WhatsApp reminders.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <section className="py-20">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6">
+            <h2 className="text-3xl sm:text-4xl font-bold text-center text-slate-900 mb-3">
+              PayRemind fixes this in 2 minutes
+            </h2>
+            <p className="text-center text-slate-500 mb-12 max-w-xl mx-auto">
+              One dashboard, zero spreadsheets, automatic WhatsApp reminders.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {[
               {
                 icon: (
@@ -155,20 +157,20 @@ export default function Home() {
                 <p className="text-sm text-slate-500 leading-relaxed">{card.body}</p>
               </div>
             ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* How it works */}
-      <section id="how-it-works" className="bg-slate-50 py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-slate-900 mb-3">
-            Up and running in 4 steps
-          </h2>
-          <p className="text-center text-slate-500 mb-14 max-w-xl mx-auto">
-            No setup calls, no training, no IT team needed.
-          </p>
-          <div className="flex flex-col gap-6">
+        <section id="how-it-works" className="bg-slate-50 py-20">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6">
+            <h2 className="text-3xl sm:text-4xl font-bold text-center text-slate-900 mb-3">
+              Up and running in 4 steps
+            </h2>
+            <p className="text-center text-slate-500 mb-14 max-w-xl mx-auto">
+              No setup calls, no training, no IT team needed.
+            </p>
+            <div className="flex flex-col gap-6">
             {[
               {
                 step: '1',
@@ -201,20 +203,20 @@ export default function Home() {
                 </div>
               </div>
             ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-20">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-slate-900 mb-3">
-            Simple, honest pricing
-          </h2>
-          <p className="text-center text-slate-500 mb-14 max-w-xl mx-auto">
-            Start free. Upgrade only when you grow.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+        <section id="pricing" className="py-20">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+            <h2 className="text-3xl sm:text-4xl font-bold text-center text-slate-900 mb-3">
+              Simple, honest pricing
+            </h2>
+            <p className="text-center text-slate-500 mb-14 max-w-xl mx-auto">
+              Start free. Upgrade only when you grow.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {/* Free */}
             <div className="rounded-2xl border border-slate-200 p-7 flex flex-col gap-4">
               <div>
@@ -299,20 +301,20 @@ export default function Home() {
                 Get annual plan
               </Link>
             </div>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* Testimonials */}
-      <section className="bg-slate-50 py-20">
-        <div className="max-w-5xl mx-auto px-4 sm:px-6">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-slate-900 mb-3">
-            Coaching teachers love it
-          </h2>
-          <p className="text-center text-slate-500 mb-12 max-w-xl mx-auto">
-            Real feedback from real teachers across India.
-          </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+        <section className="bg-slate-50 py-20">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6">
+            <h2 className="text-3xl sm:text-4xl font-bold text-center text-slate-900 mb-3">
+              Coaching teachers love it
+            </h2>
+            <p className="text-center text-slate-500 mb-12 max-w-xl mx-auto">
+              Real feedback from real teachers across India.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
             {[
               {
                 quote: '"Pehle har mahine 2 ghante WhatsApp karna padta tha. Ab ek minute mein ho jaata hai. Bahut time bacha!"',
@@ -343,20 +345,20 @@ export default function Home() {
                 </div>
               </div>
             ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
       {/* CTA */}
-      <section className="py-24 bg-indigo-600">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 leading-tight">
-            Start recovering your fees today
-          </h2>
-          <p className="text-indigo-200 text-lg mb-10 leading-relaxed">
-            Join hundreds of coaching teachers who send smarter reminders and collect fees on time — every month.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+        <section className="py-24 bg-indigo-600">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-white mb-4 leading-tight">
+              Start recovering your fees today
+            </h2>
+            <p className="text-indigo-200 text-lg mb-10 leading-relaxed">
+              Join hundreds of coaching teachers who send smarter reminders and collect fees on time — every month.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               href="/login"
               className="w-full sm:w-auto inline-flex items-center justify-center px-8 py-3.5 rounded-xl text-base font-semibold bg-white text-indigo-700 hover:bg-indigo-50 transition-colors shadow-sm"
@@ -369,21 +371,22 @@ export default function Home() {
             >
               View pricing
             </Link>
+            </div>
+            <p className="mt-5 text-sm text-indigo-300">No credit card required · Free for up to 3 students</p>
           </div>
-          <p className="mt-5 text-sm text-indigo-300">No credit card required · Free for up to 3 students</p>
-        </div>
-      </section>
+        </section>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-slate-400 py-12">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <Image src="/logo.svg" alt="PayRemind" width={120} height={36} className="h-9 w-auto opacity-70" />
-          <p className="text-xs text-center sm:text-left">
-            Fee tracking and WhatsApp reminders for coaching classes in India.
-          </p>
-          <p className="text-xs">&copy; {new Date().getFullYear()} PayRemind. All rights reserved.</p>
-        </div>
-      </footer>
-    </div>
+        {/* Footer */}
+        <footer className="bg-slate-900 text-slate-400 py-12">
+          <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <Image src="/logo-footer.svg" alt="PayRemind" width={160} height={48} className="h-11 w-auto" />
+            <p className="text-xs text-center sm:text-left">
+              Fee tracking and WhatsApp reminders for coaching classes in India.
+            </p>
+            <p className="text-xs">&copy; {new Date().getFullYear()} PayRemind. All rights reserved.</p>
+          </div>
+        </footer>
+      </div>
+    </BackgroundGlow>
   )
 }
