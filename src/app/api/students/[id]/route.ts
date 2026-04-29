@@ -36,10 +36,13 @@ export async function PUT(
     return NextResponse.json({ error: validationError }, { status: 400 })
 
   const { name, phone, fee_amount, due_day } = body
+  const batch_name = (typeof body.batch_name === 'string' && body.batch_name.trim())
+    ? body.batch_name.trim()
+    : 'Default'
 
   const { data, error } = await supabase
     .from('students')
-    .update({ name, phone, fee_amount, due_day })
+    .update({ name, phone, fee_amount, due_day, batch_name })
     .eq('id', id)
     .eq('owner_id', user.id)
     .select()

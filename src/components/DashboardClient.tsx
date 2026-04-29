@@ -10,6 +10,14 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import SubscribeButton from '@/components/SubscribeButton'
+import ReminderQueue from '@/components/ReminderQueue'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -29,13 +37,19 @@ interface Props {
 export default function DashboardClient({ students, payments, isPro, ownerEmail }: Props) {
   const router = useRouter()
   const [loadingId, setLoadingId] = useState<string | null>(null)
+  const [selectedBatch, setSelectedBatch] = useState('all')
 
   const todayDate = new Date().getDate()
 
-  const studentsWithPayments: StudentWithPayment[] = students.map((student) => ({
-    ...student,
-    payment: payments.find((p) => p.student_id === student.id),
-  }))
+  const allBatches = Array.from(new Set(students.map((s) => s.batch_name))).sort()
+  const showBatchFilter = allBatches.length > 1
+
+  const studentsWithPayments: StudentWithPayment[] = students
+    .filter((s) => selectedBatch === 'all' || s.batch_name === selectedBatch)
+    .map((student) => ({
+      ...student,
+      payment: payments.find((p) => p.student_id === student.id),
+    }))
 
   function displayStatus(swp: StudentWithPayment): 'paid' | 'overdue' | 'pending' {
     if (swp.payment?.status === 'paid') return 'paid'
@@ -98,14 +112,31 @@ export default function DashboardClient({ students, payments, isPro, ownerEmail 
       <main className="max-w-5xl mx-auto px-4 py-6 flex flex-col gap-6">
         {/* Summary card */}
         <Card>
-          <CardContent className="py-4">
-            <p className="text-sm text-muted-foreground">This month</p>
-            <p className="text-2xl font-bold mt-1">
-              ₹{totalCollected.toLocaleString('en-IN')}{' '}
-              <span className="text-base font-normal text-muted-foreground">
-                collected / ₹{grandTotal.toLocaleString('en-IN')} total
-              </span>
-            </p>
+          <CardContent className="py-4 flex items-center justify-between gap-4">
+            <div>
+              <p className="text-sm text-muted-foreground">
+                This month{selectedBatch !== 'all' ? ` · ${selectedBatch}` : ''}
+              </p>
+              <p className="text-2xl font-bold mt-1">
+                ₹{totalCollected.toLocaleString('en-IN')}{' '}
+                <span className="text-base font-normal text-muted-foreground">
+                  collected / ₹{grandTotal.toLocaleString('en-IN')} total
+                </span>
+              </p>
+            </div>
+            {showBatchFilter && (
+              <Select value={selectedBatch} onValueChange={(v) => setSelectedBatch(v ?? 'all')}>
+                <SelectTrigger className="w-44 shrink-0">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Batches</SelectItem>
+                  {allBatches.map((b) => (
+                    <SelectItem key={b} value={b}>{b}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </CardContent>
         </Card>
 
@@ -121,6 +152,9 @@ export default function DashboardClient({ students, payments, isPro, ownerEmail 
             </CardContent>
           </Card>
         )}
+
+        {/* Reminder queue */}
+        <ReminderQueue students={students} payments={payments} selectedBatch={selectedBatch} />
 
         {/* Students table */}
         {studentsWithPayments.length === 0 ? (

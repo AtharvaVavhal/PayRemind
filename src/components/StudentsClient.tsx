@@ -46,9 +46,10 @@ interface FormState {
   phone: string
   fee_amount: string
   due_day: string
+  batch_name: string
 }
 
-const EMPTY_FORM: FormState = { name: '', phone: '', fee_amount: '', due_day: '1' }
+const EMPTY_FORM: FormState = { name: '', phone: '', fee_amount: '', due_day: '1', batch_name: '' }
 const DUE_DAYS = Array.from({ length: 28 }, (_, i) => String(i + 1))
 const FREE_LIMIT = 3
 
@@ -82,6 +83,7 @@ export default function StudentsClient({ students, userId, isPro }: Props) {
       phone: student.phone.slice(2),
       fee_amount: String(student.fee_amount),
       due_day: String(student.due_day),
+      batch_name: student.batch_name === 'Default' ? '' : student.batch_name,
     })
     setError('')
     setEditTarget(student)
@@ -102,6 +104,7 @@ export default function StudentsClient({ students, userId, isPro }: Props) {
       phone: '91' + form.phone.trim(),
       fee_amount: Number(form.fee_amount),
       due_day: Number(form.due_day),
+      batch_name: form.batch_name.trim() || 'Default',
       owner_id: userId,
     }
 
@@ -285,6 +288,17 @@ export default function StudentsClient({ students, userId, isPro }: Props) {
                 onChange={field('fee_amount')}
                 min={100}
                 required
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <Label htmlFor="s-batch">Batch Name <span className="text-muted-foreground font-normal">(optional)</span></Label>
+              <Input
+                id="s-batch"
+                type="text"
+                placeholder="e.g. Morning Batch, Evening Batch"
+                value={form.batch_name}
+                onChange={field('batch_name')}
               />
             </div>
 

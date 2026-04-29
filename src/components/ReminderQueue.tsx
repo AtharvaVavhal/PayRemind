@@ -10,6 +10,7 @@ import { Card, CardContent } from '@/components/ui/card'
 interface Props {
   students: Student[]
   payments: Payment[]
+  selectedBatch: string
 }
 
 function todayStr(): string {
@@ -40,14 +41,16 @@ function isReminderDue(swp: StudentWithPayment): boolean {
   return dueDateStr(payment.month, swp.due_day) <= today
 }
 
-export default function ReminderQueue({ students, payments }: Props) {
+export default function ReminderQueue({ students, payments, selectedBatch }: Props) {
   const router = useRouter()
   const [loadingId, setLoadingId] = useState<string | null>(null)
 
-  const studentsWithPayments: StudentWithPayment[] = students.map((s) => ({
-    ...s,
-    payment: payments.find((p) => p.student_id === s.id),
-  }))
+  const studentsWithPayments: StudentWithPayment[] = students
+    .filter((s) => selectedBatch === 'all' || s.batch_name === selectedBatch)
+    .map((s) => ({
+      ...s,
+      payment: payments.find((p) => p.student_id === s.id),
+    }))
 
   const due = studentsWithPayments.filter(isReminderDue)
 

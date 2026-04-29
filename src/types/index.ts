@@ -5,6 +5,7 @@ export interface Student {
   phone: string
   fee_amount: number
   due_day: number
+  batch_name: string
   created_at: string
 }
 

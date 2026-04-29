@@ -72,10 +72,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: validationError }, { status: 400 })
 
   const { name, phone, fee_amount, due_day } = body
+  const batch_name = (typeof body.batch_name === 'string' && body.batch_name.trim())
+    ? body.batch_name.trim()
+    : 'Default'
 
   const { data, error } = await supabase
     .from('students')
-    .insert({ name, phone, fee_amount, due_day, owner_id: user.id })
+    .insert({ name, phone, fee_amount, due_day, batch_name, owner_id: user.id })
     .select()
     .single()
 
