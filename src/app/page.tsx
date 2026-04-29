@@ -8,8 +8,7 @@ export default function Home() {
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <Image src="/logo.svg" alt="PayRemind" width={32} height={32} />
-            <span className="font-bold text-lg text-slate-900">PayRemind</span>
+            <Image src="/logo.svg" alt="PayRemind" width={120} height={36} className="h-9 w-auto" />
           </Link>
           <nav className="flex items-center gap-3">
             <Link
@@ -378,10 +377,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="bg-slate-900 text-slate-400 py-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-2">
-            <Image src="/logo.svg" alt="PayRemind" width={24} height={24} className="opacity-70" />
-            <span className="text-slate-300 font-semibold text-sm">PayRemind</span>
-          </div>
+          <Image src="/logo.svg" alt="PayRemind" width={120} height={36} className="h-9 w-auto opacity-70" />
           <p className="text-xs text-center sm:text-left">
             Fee tracking and WhatsApp reminders for coaching classes in India.
           </p>
