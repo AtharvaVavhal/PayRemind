@@ -1,6 +1,12 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 
+function addDays(base: Date, days: number): string {
+  const d = new Date(base)
+  d.setDate(d.getDate() + days)
+  return d.toISOString().split('T')[0]
+}
+
 export async function PATCH(
   _request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -14,10 +20,9 @@ export async function PATCH(
 
   const { id } = await params
 
-  // Verify payment belongs to the logged-in owner via join
-  const { error: fetchError } = await supabase
+  const { data: payment, error: fetchError } = await supabase
     .from('payments')
-    .select('id, students!inner(owner_id)')
+    .select('id, reminder_count, month, students!inner(owner_id, due_day)')
     .eq('id', id)
     .eq('students.owner_id', user.id)
     .single()
@@ -28,9 +33,22 @@ export async function PATCH(
     return NextResponse.json({ error: fetchError.message }, { status: 500 })
   }
 
+  const student = Array.isArray(payment.students) ? payment.students[0] : payment.students
+  const newCount = (payment.reminder_count ?? 0) + 1
+  const dueDate = new Date(`${payment.month}-${String(student.due_day).padStart(2, '0')}`)
+
+  let next_reminder_due: string | null = null
+  if (newCount === 1) next_reminder_due = addDays(dueDate, 7)
+  else if (newCount === 2) next_reminder_due = addDays(dueDate, 10)
+  // newCount >= 3 → null (no more scheduled reminders)
+
   const { data, error } = await supabase
     .from('payments')
-    .update({ reminder_sent_at: new Date().toISOString() })
+    .update({
+      reminder_sent_at: new Date().toISOString(),
+      reminder_count: newCount,
+      next_reminder_due,
+    })
     .eq('id', id)
     .select()
     .single()

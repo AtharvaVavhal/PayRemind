@@ -15,6 +15,8 @@ export interface Payment {
   status: 'pending' | 'paid'
   paid_at: string | null
   reminder_sent_at: string | null
+  reminder_count: number
+  next_reminder_due: string | null
 }
 
 export type StudentWithPayment = Student & { payment?: Payment }
