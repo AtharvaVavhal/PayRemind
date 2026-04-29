@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { generateWhatsAppLink } from '@/lib/whatsapp'
 import { generateReceipt } from '@/lib/receipt'
-import type { Student, Payment, StudentWithPayment } from '@/types'
+import type { Student, Payment, StudentWithPayment, Template } from '@/types'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -38,6 +38,19 @@ export default function DashboardClient({ students, payments, isPro, ownerEmail 
   const router = useRouter()
   const [loadingId, setLoadingId] = useState<string | null>(null)
   const [selectedBatch, setSelectedBatch] = useState('all')
+  const [templates, setTemplates] = useState<Template[]>([])
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
+
+  useEffect(() => {
+    fetch('/api/templates')
+      .then((r) => r.json())
+      .then((data: Template[]) => {
+        setTemplates(data)
+        const def = data.find((t) => t.is_default) ?? data[0]
+        if (def) setSelectedTemplateId(def.id)
+      })
+      .catch(() => {})
+  }, [])
 
   const todayDate = new Date().getDate()
 
@@ -65,7 +78,11 @@ export default function DashboardClient({ students, payments, isPro, ownerEmail 
 
   async function handleReminder(swp: StudentWithPayment) {
     if (!swp.payment || loadingId) return
-    const link = generateWhatsAppLink(swp.name, swp.phone, swp.fee_amount, swp.payment.id)
+    const tpl = templates.find((t) => t.id === selectedTemplateId)
+    const link = generateWhatsAppLink(
+      swp.name, swp.phone, swp.fee_amount, swp.payment.id,
+      tpl?.message, swp.payment.month
+    )
     window.open(link, '_blank', 'noopener,noreferrer')
     setLoadingId(swp.payment.id)
     await fetch(`/api/payments/${swp.payment.id}/reminder`, { method: 'PATCH' })
@@ -124,19 +141,33 @@ export default function DashboardClient({ students, payments, isPro, ownerEmail 
                 </span>
               </p>
             </div>
-            {showBatchFilter && (
-              <Select value={selectedBatch} onValueChange={(v) => setSelectedBatch(v ?? 'all')}>
-                <SelectTrigger className="w-44 shrink-0">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Batches</SelectItem>
-                  {allBatches.map((b) => (
-                    <SelectItem key={b} value={b}>{b}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            )}
+            <div className="flex items-center gap-2 shrink-0 flex-wrap justify-end">
+              {showBatchFilter && (
+                <Select value={selectedBatch} onValueChange={(v) => setSelectedBatch(v ?? 'all')}>
+                  <SelectTrigger className="w-40">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Batches</SelectItem>
+                    {allBatches.map((b) => (
+                      <SelectItem key={b} value={b}>{b}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+              {templates.length > 1 && (
+                <Select value={selectedTemplateId} onValueChange={(v) => setSelectedTemplateId(v ?? '')}>
+                  <SelectTrigger className="w-44">
+                    <SelectValue placeholder="Template" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {templates.map((t) => (
+                      <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
           </CardContent>
         </Card>
 

@@ -21,3 +21,12 @@ export interface Payment {
 }
 
 export type StudentWithPayment = Student & { payment?: Payment }
+
+export interface Template {
+  id: string
+  owner_id: string
+  name: string
+  message: string
+  is_default: boolean
+  created_at: string
+}
