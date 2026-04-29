@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { generateWhatsAppLink } from '@/lib/whatsapp'
+import { generateReceipt } from '@/lib/receipt'
 import type { Student, Payment, StudentWithPayment } from '@/types'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -22,9 +23,10 @@ interface Props {
   students: Student[]
   payments: Payment[]
   isPro: boolean
+  ownerEmail: string
 }
 
-export default function DashboardClient({ students, payments, isPro }: Props) {
+export default function DashboardClient({ students, payments, isPro, ownerEmail }: Props) {
   const router = useRouter()
   const [loadingId, setLoadingId] = useState<string | null>(null)
 
@@ -63,6 +65,32 @@ export default function DashboardClient({ students, payments, isPro }: Props) {
     await fetch(`/api/payments/${swp.payment.id}/paid`, { method: 'PATCH' })
     setLoadingId(null)
     router.refresh()
+  }
+
+  async function handleDownloadReceipt(swp: StudentWithPayment) {
+    if (!swp.payment?.paid_at) return
+    await generateReceipt({
+      studentName: swp.name,
+      phone: swp.phone,
+      feeAmount: swp.fee_amount,
+      month: swp.payment.month,
+      paidAt: swp.payment.paid_at,
+      ownerEmail,
+    })
+  }
+
+  async function handleSendReceiptWhatsApp(swp: StudentWithPayment) {
+    if (!swp.payment?.paid_at) return
+    await generateReceipt({
+      studentName: swp.name,
+      phone: swp.phone,
+      feeAmount: swp.fee_amount,
+      month: swp.payment.month,
+      paidAt: swp.payment.paid_at,
+      ownerEmail,
+    })
+    const message = `Namaste! ${swp.name} ki fees ₹${swp.fee_amount} receive ho gayi. Receipt attached hai. Dhanyawad! - PayRemind`
+    window.open(`https://wa.me/${swp.phone}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
   }
 
   return (
@@ -117,6 +145,7 @@ export default function DashboardClient({ students, payments, isPro }: Props) {
                     <TableHead>Status</TableHead>
                     <TableHead>Reminder</TableHead>
                     <TableHead>Mark Paid</TableHead>
+                    <TableHead>Receipt</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -164,6 +193,26 @@ export default function DashboardClient({ students, payments, isPro }: Props) {
                             >
                               {isLoading ? '…' : 'Mark Paid'}
                             </Button>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {status === 'paid' && swp.payment?.paid_at && (
+                            <div className="flex items-center gap-1">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleDownloadReceipt(swp)}
+                              >
+                                Download PDF
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => handleSendReceiptWhatsApp(swp)}
+                              >
+                                Send WhatsApp
+                              </Button>
+                            </div>
                           )}
                         </TableCell>
                       </TableRow>

@@ -69,5 +69,12 @@ export default async function DashboardPage() {
 
   const isPro = profile?.is_pro ?? false
 
-  return <DashboardClient students={students} payments={payments} isPro={isPro} />
+  return (
+    <DashboardClient
+      students={students}
+      payments={payments}
+      isPro={isPro}
+      ownerEmail={user.email ?? ''}
+    />
+  )
 }
