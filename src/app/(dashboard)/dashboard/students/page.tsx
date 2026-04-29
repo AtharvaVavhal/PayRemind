@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import StudentsClient from '@/components/StudentsClient'
 import TemplateManager from '@/components/TemplateManager'
+import CSVImport from '@/components/CSVImport'
 import type { Student } from '@/types'
 
 export default async function StudentsPage() {
@@ -31,7 +32,8 @@ export default async function StudentsPage() {
   return (
     <>
       <StudentsClient students={students} userId={user.id} isPro={isPro} />
-      <div className="max-w-5xl mx-auto px-4 pb-8">
+      <div className="max-w-5xl mx-auto px-4 pb-8 flex flex-col gap-3">
+        <CSVImport />
         <TemplateManager />
       </div>
     </>
