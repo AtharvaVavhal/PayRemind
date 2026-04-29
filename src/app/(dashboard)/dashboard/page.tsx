@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
 import DashboardClient from '@/components/DashboardClient'
+import CollectionReport from '@/components/CollectionReport'
 import type { Payment, Student } from '@/types'
 
 function currentMonth(): string {
@@ -70,11 +71,16 @@ export default async function DashboardPage() {
   const isPro = profile?.is_pro ?? false
 
   return (
-    <DashboardClient
-      students={students}
-      payments={payments}
-      isPro={isPro}
-      ownerEmail={user.email ?? ''}
-    />
+    <>
+      <DashboardClient
+        students={students}
+        payments={payments}
+        isPro={isPro}
+        ownerEmail={user.email ?? ''}
+      />
+      <div className="max-w-5xl mx-auto px-4 pb-8">
+        <CollectionReport students={students} payments={payments} month={month} />
+      </div>
+    </>
   )
 }
