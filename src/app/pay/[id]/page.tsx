@@ -66,10 +66,11 @@ export default async function PublicPaymentPage({
                 </div>
               </div>
 
-              <PaymentClientWrapper 
-                paymentId={payment.id} 
-                studentName={student.name} 
-                feeAmount={student.fee_amount} 
+              <PaymentClientWrapper
+                paymentId={payment.id}
+                studentName={student.name}
+                feeAmount={student.fee_amount}
+                razorpayKey={process.env.RAZORPAY_KEY_ID ?? ''}
               />
             </div>
           )}

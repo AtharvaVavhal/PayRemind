@@ -7,6 +7,7 @@ interface Props {
   paymentId: string
   studentName: string
   feeAmount: number
+  razorpayKey: string
   onSuccess: () => void
 }
 
@@ -33,6 +34,7 @@ export default function PaymentButton({
   paymentId,
   studentName,
   feeAmount,
+  razorpayKey,
   onSuccess,
 }: Props) {
   const [loading, setLoading] = useState(false)
@@ -63,7 +65,7 @@ export default function PaymentButton({
     const { order_id, amount, currency } = await orderRes.json()
 
     const options = {
-      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, // ✅ Fixed environment variable
+      key: razorpayKey,
       amount,
       currency,
       name: 'PayRemind',

@@ -7,21 +7,20 @@ interface Props {
   paymentId: string
   studentName: string
   feeAmount: number
+  razorpayKey: string
 }
 
-export default function PaymentClientWrapper({ paymentId, studentName, feeAmount }: Props) {
+export default function PaymentClientWrapper({ paymentId, studentName, feeAmount, razorpayKey }: Props) {
   const router = useRouter()
 
   return (
     <div className="w-full flex justify-center">
-      <PaymentButton 
+      <PaymentButton
         paymentId={paymentId}
         studentName={studentName}
         feeAmount={feeAmount}
-        onSuccess={() => {
-          // When Razorpay succeeds, refresh the page to show the "Payment Complete!" UI
-          router.refresh()
-        }}
+        razorpayKey={razorpayKey}
+        onSuccess={() => router.refresh()}
       />
     </div>
   )
