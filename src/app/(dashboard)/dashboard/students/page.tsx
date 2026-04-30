@@ -1,8 +1,10 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
+import { getOwnerIdForUser } from '@/lib/staff'
 import StudentsClient from '@/components/StudentsClient'
 import TemplateManager from '@/components/TemplateManager'
 import CSVImport from '@/components/CSVImport'
+import StaffManager from '@/components/StaffManager'
 import type { Student } from '@/types'
 
 export default async function StudentsPage() {
@@ -13,10 +15,12 @@ export default async function StudentsPage() {
 
   if (!user) redirect('/login')
 
+  const ownerId = await getOwnerIdForUser(supabase, user.id, user.email ?? '')
+
   const { data } = await supabase
     .from('students')
     .select('*')
-    .eq('owner_id', user.id)
+    .eq('owner_id', ownerId)
     .order('created_at', { ascending: true })
 
   const students: Student[] = data ?? []
@@ -24,16 +28,17 @@ export default async function StudentsPage() {
   const { data: profile } = await supabase
     .from('profiles')
     .select('is_pro')
-    .eq('id', user.id)
+    .eq('id', ownerId)
     .single()
 
   const isPro = profile?.is_pro ?? false
 
   return (
     <>
-      <StudentsClient students={students} userId={user.id} isPro={isPro} />
+      <StudentsClient students={students} userId={ownerId} isPro={isPro} />
       <div className="max-w-5xl mx-auto px-4 pb-8 flex flex-col gap-3">
         <CSVImport />
+        <StaffManager />
         <TemplateManager />
       </div>
     </>

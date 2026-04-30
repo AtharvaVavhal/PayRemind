@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
+import { getOwnerIdForUser } from '@/lib/staff'
 
 function validate(body: Record<string, unknown>): string | null {
   const { name, phone, fee_amount, due_day } = body
@@ -26,10 +27,12 @@ export async function GET() {
 
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const ownerId = await getOwnerIdForUser(supabase, user.id, user.email ?? '')
+
   const { data, error } = await supabase
     .from('students')
     .select('*')
-    .eq('owner_id', user.id)
+    .eq('owner_id', ownerId)
     .order('name')
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -44,10 +47,12 @@ export async function POST(request: Request) {
 
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const ownerId = await getOwnerIdForUser(supabase, user.id, user.email ?? '')
+
   const { data: profile } = await supabase
     .from('profiles')
     .select('is_pro')
-    .eq('id', user.id)
+    .eq('id', ownerId)
     .single()
 
   const isPro = profile?.is_pro ?? false
@@ -56,7 +61,7 @@ export async function POST(request: Request) {
     const { count } = await supabase
       .from('students')
       .select('*', { count: 'exact', head: true })
-      .eq('owner_id', user.id)
+      .eq('owner_id', ownerId)
 
     if ((count ?? 0) >= 3) {
       return NextResponse.json(
@@ -78,10 +83,13 @@ export async function POST(request: Request) {
 
   const { data, error } = await supabase
     .from('students')
-    .insert({ name, phone, fee_amount, due_day, batch_name, owner_id: user.id })
+    .insert({ name, phone, fee_amount, due_day, batch_name, owner_id: ownerId })
     .select()
     .single()
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) {
+    console.error('Student insert error:', error)
+    return NextResponse.json({ error: error.message }, { status: 500 })
+  }
   return NextResponse.json(data, { status: 201 })
 }

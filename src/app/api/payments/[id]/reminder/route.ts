@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
+import { getOwnerIdForUser } from '@/lib/staff'
 
 function addDays(base: Date, days: number): string {
   const d = new Date(base)
@@ -18,13 +19,14 @@ export async function PATCH(
 
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const ownerId = await getOwnerIdForUser(supabase, user.id, user.email ?? '')
   const { id } = await params
 
   const { data: payment, error: fetchError } = await supabase
     .from('payments')
     .select('id, reminder_count, month, students!inner(owner_id, due_day)')
     .eq('id', id)
-    .eq('students.owner_id', user.id)
+    .eq('students.owner_id', ownerId)
     .single()
 
   if (fetchError) {

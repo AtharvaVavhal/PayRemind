@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
+import { getOwnerIdForUser } from '@/lib/staff'
 import DashboardClient from '@/components/DashboardClient'
 import CollectionReport from '@/components/CollectionReport'
 import type { Payment, Student } from '@/types'
@@ -17,12 +18,13 @@ export default async function DashboardPage() {
 
   if (!user) redirect('/login')
 
+  const ownerId = await getOwnerIdForUser(supabase, user.id, user.email ?? '')
   const month = currentMonth()
 
   const { data: studentsData } = await supabase
     .from('students')
     .select('*')
-    .eq('owner_id', user.id)
+    .eq('owner_id', ownerId)
     .order('name')
 
   const students: Student[] = studentsData ?? []
@@ -65,7 +67,7 @@ export default async function DashboardPage() {
   const { data: profile } = await supabase
     .from('profiles')
     .select('is_pro')
-    .eq('id', user.id)
+    .eq('id', ownerId)
     .single()
 
   const isPro = profile?.is_pro ?? false

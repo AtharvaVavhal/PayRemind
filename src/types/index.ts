@@ -22,6 +22,15 @@ export interface Payment {
 
 export type StudentWithPayment = Student & { payment?: Payment }
 
+export interface Staff {
+  id: string
+  owner_id: string
+  email: string
+  name: string
+  role: 'owner' | 'staff'
+  created_at: string
+}
+
 export interface Template {
   id: string
   owner_id: string

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase-server'
+import { getOwnerIdForUser } from '@/lib/staff'
 
 export async function PATCH(
   _request: Request,
@@ -12,14 +13,15 @@ export async function PATCH(
 
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const ownerId = await getOwnerIdForUser(supabase, user.id, user.email ?? '')
   const { id } = await params
 
-  // Verify payment belongs to the logged-in owner via join
+  // Verify payment belongs to the resolved owner via join
   const { error: fetchError } = await supabase
     .from('payments')
     .select('id, students!inner(owner_id)')
     .eq('id', id)
-    .eq('students.owner_id', user.id)
+    .eq('students.owner_id', ownerId)
     .single()
 
   if (fetchError) {
