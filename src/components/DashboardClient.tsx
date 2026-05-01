@@ -119,20 +119,10 @@ export default function DashboardClient({ students, payments, isPro, ownerEmail 
     })
   }
 
-  async function handleSendReceiptWhatsApp(swp: StudentWithPayment) {
+  function handleSendReceiptWhatsApp(swp: StudentWithPayment) {
     if (!swp.payment?.paid_at) return
     const message = `Namaste! ${swp.name} ki fees ₹${swp.fee_amount} receive ho gayi. Receipt attached hai. Dhanyawad! - PayRemind`
     window.open(`https://wa.me/${swp.phone}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
-    await generateReceipt({
-      studentName: swp.name,
-      phone: swp.phone,
-      feeAmount: swp.fee_amount,
-      month: swp.payment.month,
-      paidAt: swp.payment.paid_at,
-      ownerEmail,
-      batchName: swp.batch_name,
-      receiptNo: swp.payment.receipt_no ?? undefined,
-    })
   }
 
   return (
