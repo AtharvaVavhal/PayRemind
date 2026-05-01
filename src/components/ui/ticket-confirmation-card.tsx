@@ -152,6 +152,16 @@ const PaymentConfirmationTicket = React.forwardRef<HTMLDivElement, TicketProps>(
           <div className="absolute -left-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background" />
           <div className="absolute -right-4 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-background" />
 
+          {/* Institution logo top-left */}
+          <div className="px-6 pt-5 pb-3 border-b border-border/40">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/institution-logo.png"
+              alt="Institution"
+              className="h-9 w-auto object-contain object-left"
+            />
+          </div>
+
           {/* Header */}
           <div className="p-8 flex flex-col items-center text-center">
             <div className="p-3 bg-primary/10 rounded-full animate-in zoom-in-50 delay-300 duration-500">

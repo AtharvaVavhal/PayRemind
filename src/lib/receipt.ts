@@ -39,10 +39,10 @@ function buildReceiptNo(receiptNo?: string): string {
   return receiptNo ?? `REC-${Math.floor(10000 + Math.random() * 90000)}`
 }
 
-async function svgToPng(svgUrl: string, pxW: number, pxH: number): Promise<string> {
-  const text = await (await fetch(svgUrl)).text()
-  const blob = new Blob([text], { type: 'image/svg+xml' })
-  const url = URL.createObjectURL(blob)
+async function loadImageDataUrl(url: string, pxW: number, pxH: number): Promise<string> {
+  const res = await fetch(url)
+  const blob = await res.blob()
+  const objectUrl = URL.createObjectURL(blob)
   return new Promise((resolve, reject) => {
     const img = new Image()
     img.onload = () => {
@@ -50,13 +50,14 @@ async function svgToPng(svgUrl: string, pxW: number, pxH: number): Promise<strin
       canvas.width = pxW * 2
       canvas.height = pxH * 2
       const ctx = canvas.getContext('2d')!
-      ctx.scale(2, 2)
-      ctx.drawImage(img, 0, 0, pxW, pxH)
-      URL.revokeObjectURL(url)
+      ctx.fillStyle = '#ffffff'
+      ctx.fillRect(0, 0, canvas.width, canvas.height)
+      ctx.drawImage(img, 0, 0, pxW * 2, pxH * 2)
+      URL.revokeObjectURL(objectUrl)
       resolve(canvas.toDataURL('image/png'))
     }
     img.onerror = reject
-    img.src = url
+    img.src = objectUrl
   })
 }
 
@@ -72,9 +73,9 @@ const GRAY_300:   [number, number, number] = [203, 213, 225]
 const GRAY_LIGHT: [number, number, number] = [229, 231, 235]
 const GRAY_BG:    [number, number, number] = [249, 250, 251]
 
-// logo-footer.svg viewBox 400×120 → aspect 10:3, rendered at 60×18mm
-const LOGO_W = 60
-const LOGO_H = 18
+// Institution logo: 1549×666px → aspect ~2.326:1, rendered at 65×28mm
+const INST_W = 65
+const INST_H = 28
 
 export async function generateReceipt(data: ReceiptData): Promise<void> {
   const { jsPDF } = await import('jspdf')
@@ -86,40 +87,36 @@ export async function generateReceipt(data: ReceiptData): Promise<void> {
   const CW  = MR - ML   // 174mm
   const receiptNo = buildReceiptNo(data.receiptNo)
 
-  // ── HEADER BAND (0–52mm) ──────────────────────────────────────────────────────
-  doc.setFillColor(...NAVY)
-  doc.rect(0, 0, W, 52, 'F')
-
-  // Logo (white variant) left-aligned, vertically centred in band
-  const logoY = (52 - LOGO_H) / 2   // 17mm
+  // ── HEADER: institution logo (left) + RECEIPT title (right) ──────────────────
   try {
-    const png = await svgToPng('/logo-footer.svg', 300, 90)
-    doc.addImage(png, 'PNG', ML, logoY, LOGO_W, LOGO_H)
+    const png = await loadImageDataUrl('/institution-logo.png', INST_W * 5, INST_H * 5)
+    doc.addImage(png, 'PNG', ML, 6, INST_W, INST_H)
   } catch {
     doc.setFont('helvetica', 'bold')
-    doc.setFontSize(22)
-    doc.setTextColor(...WHITE)
-    doc.text('PayRemind', ML, logoY + 13)
+    doc.setFontSize(13)
+    doc.setTextColor(...NAVY)
+    doc.text('VISHWAKARMA INSTITUTE OF TECHNOLOGY', ML, 18)
+    doc.setFontSize(9)
+    doc.text('Pune', ML, 26)
   }
 
-  // RECEIPT title + meta (right-aligned)
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(26)
-  doc.setTextColor(...WHITE)
-  doc.text('RECEIPT', MR, 26, { align: 'right' })
+  doc.setTextColor(...NAVY)
+  doc.text('RECEIPT', MR, 18, { align: 'right' })
 
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(9)
-  doc.setTextColor(...GRAY_300)
-  doc.text(receiptNo, MR, 36, { align: 'right' })
-  doc.text(formatDate(data.paidAt), MR, 44, { align: 'right' })
+  doc.setTextColor(...GRAY)
+  doc.text(receiptNo, MR, 27, { align: 'right' })
+  doc.text(formatDate(data.paidAt), MR, 35, { align: 'right' })
 
-  // ── INDIGO ACCENT STRIPE (52–55mm) ────────────────────────────────────────────
+  // ── INDIGO ACCENT STRIPE ──────────────────────────────────────────────────────
   doc.setFillColor(...INDIGO)
-  doc.rect(0, 52, W, 3, 'F')
+  doc.rect(0, 41, W, 3, 'F')
 
   // ── INFO SECTION ─────────────────────────────────────────────────────────────
-  const infoY = 70
+  const infoY = 58
 
   // Left: BILLED TO
   doc.setFont('helvetica', 'bold')
@@ -169,17 +166,17 @@ export async function generateReceipt(data: ReceiptData): Promise<void> {
   // ── SECTION DIVIDER ───────────────────────────────────────────────────────────
   doc.setDrawColor(...GRAY_LIGHT)
   doc.setLineWidth(0.3)
-  doc.line(ML, 110, MR, 110)
+  doc.line(ML, 98, MR, 98)
 
   // ── ITEMS TABLE ───────────────────────────────────────────────────────────────
-  const tY  = 116    // table top
-  const rH  = 11     // row height
-  const cA  = ML + 100  // description | period boundary (x=118)
-  const cB  = cA + 40   // period | amount boundary   (x=158)
+  const tY  = 104
+  const rH  = 11
+  const cA  = ML + 100
+  const cB  = cA + 40
 
-  const tx1 = ML + 4        // description text x
-  const tx2 = cA + 20       // period center x (x=138)
-  const tx3 = MR - 4        // amount right x
+  const tx1 = ML + 4
+  const tx2 = cA + 20
+  const tx3 = MR - 4
 
   // Header row
   doc.setFillColor(...GRAY_BG)
@@ -212,7 +209,7 @@ export async function generateReceipt(data: ReceiptData): Promise<void> {
   doc.text(`Rs. ${data.feeAmount.toLocaleString('en-IN')}`, tx3, dY + rH - 3.5, { align: 'right' })
 
   // ── TOTAL ROW ─────────────────────────────────────────────────────────────────
-  const totY = dY + rH + 6   // ~144mm
+  const totY = dY + rH + 6
 
   doc.setFillColor(...INDIGO)
   doc.rect(ML, totY, CW, 16, 'F')
@@ -228,10 +225,10 @@ export async function generateReceipt(data: ReceiptData): Promise<void> {
   doc.text(`Rs. ${data.feeAmount.toLocaleString('en-IN')}`, MR - 4, totY + 12, { align: 'right' })
 
   // ── PAID STAMP ────────────────────────────────────────────────────────────────
-  const sY = totY + 28      // ~188mm
+  const sY = totY + 28
   const sW = 52
   const sH = 17
-  const sX = (W - sW) / 2   // centred
+  const sX = (W - sW) / 2
 
   doc.setFillColor(...GREEN)
   doc.roundedRect(sX, sY, sW, sH, 3, 3, 'F')
