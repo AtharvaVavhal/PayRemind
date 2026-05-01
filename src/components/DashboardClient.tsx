@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { generateWhatsAppLink } from '@/lib/whatsapp'
 import { generateReceipt } from '@/lib/receipt'
+import { PaymentConfirmationTicket } from '@/components/ui/ticket-confirmation-card'
 import type { Student, Payment, StudentWithPayment, Template } from '@/types'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -37,6 +38,7 @@ interface Props {
 export default function DashboardClient({ students, payments, isPro, ownerEmail }: Props) {
   const router = useRouter()
   const [loadingId, setLoadingId] = useState<string | null>(null)
+  const [confirmedPayment, setConfirmedPayment] = useState<{ swp: StudentWithPayment; paidAt: string } | null>(null)
   const [selectedBatch, setSelectedBatch] = useState('all')
   const [templates, setTemplates] = useState<Template[]>([])
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
@@ -95,6 +97,11 @@ export default function DashboardClient({ students, payments, isPro, ownerEmail 
     setLoadingId(swp.payment.id)
     await fetch(`/api/payments/${swp.payment.id}/paid`, { method: 'PATCH' })
     setLoadingId(null)
+    setConfirmedPayment({ swp, paidAt: new Date().toISOString() })
+  }
+
+  function handleCloseConfirmation() {
+    setConfirmedPayment(null)
     router.refresh()
   }
 
@@ -107,6 +114,8 @@ export default function DashboardClient({ students, payments, isPro, ownerEmail 
       month: swp.payment.month,
       paidAt: swp.payment.paid_at,
       ownerEmail,
+      batchName: swp.batch_name,
+      receiptNo: swp.payment.receipt_no ?? undefined,
     })
   }
 
@@ -119,6 +128,8 @@ export default function DashboardClient({ students, payments, isPro, ownerEmail 
       month: swp.payment.month,
       paidAt: swp.payment.paid_at,
       ownerEmail,
+      batchName: swp.batch_name,
+      receiptNo: swp.payment.receipt_no ?? undefined,
     })
     const message = `Namaste! ${swp.name} ki fees ₹${swp.fee_amount} receive ho gayi. Receipt attached hai. Dhanyawad! - PayRemind`
     window.open(`https://wa.me/${swp.phone}?text=${encodeURIComponent(message)}`, '_blank', 'noopener,noreferrer')
@@ -126,6 +137,30 @@ export default function DashboardClient({ students, payments, isPro, ownerEmail 
 
   return (
     <div className="min-h-screen bg-white">
+      {/* Payment confirmation overlay */}
+      {confirmedPayment && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-black/60 backdrop-blur-sm p-6"
+          onClick={handleCloseConfirmation}
+        >
+          <PaymentConfirmationTicket
+            receiptNo={confirmedPayment.swp.payment!.receipt_no ?? ''}
+            amount={confirmedPayment.swp.fee_amount}
+            date={new Date(confirmedPayment.paidAt)}
+            studentName={confirmedPayment.swp.name}
+            phone={confirmedPayment.swp.phone}
+            barcodeValue={confirmedPayment.swp.payment!.receipt_no?.replace('REC-', '') ?? confirmedPayment.swp.payment!.id.slice(0, 14)}
+            onClick={(e) => e.stopPropagation()}
+          />
+          <button
+            onClick={handleCloseConfirmation}
+            className="text-white/70 hover:text-white text-sm transition-colors"
+          >
+            Tap anywhere to close
+          </button>
+        </div>
+      )}
+
       <main className="max-w-5xl mx-auto px-4 py-6 flex flex-col gap-6">
         {/* Summary card */}
         <Card>
@@ -158,7 +193,9 @@ export default function DashboardClient({ students, payments, isPro, ownerEmail 
               {templates.length > 1 && (
                 <Select value={selectedTemplateId} onValueChange={(v) => setSelectedTemplateId(v ?? '')}>
                   <SelectTrigger className="w-44">
-                    <SelectValue placeholder="Template" />
+                    <SelectValue placeholder="Template">
+                      {templates.find((t) => t.id === selectedTemplateId)?.name ?? 'Template'}
+                    </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     {templates.map((t) => (

@@ -18,6 +18,7 @@ export interface Payment {
   reminder_sent_at: string | null
   reminder_count: number
   next_reminder_due: string | null
+  receipt_no: string | null
 }
 
 export type StudentWithPayment = Student & { payment?: Payment }
