@@ -30,7 +30,7 @@ export default async function PublicPaymentPage({
   // Paid — show the animated ticket (no outer card, ticket is self-contained)
   if (payment.status === 'paid') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-blue-50 to-sky-100 p-6">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 px-4 pt-4 pb-20">
         <PaymentSuccessClient
           receiptNo={payment.receipt_no ?? payment.id.slice(0, 8).toUpperCase()}
           studentName={student.name}
@@ -45,7 +45,7 @@ export default async function PublicPaymentPage({
 
   // Pending — show the payment form
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-50 via-blue-50 to-sky-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-4">
       <Card className="max-w-md w-full shadow-lg">
         <CardContent className="p-6">
           <div className="flex flex-col gap-6">
